@@ -34,7 +34,7 @@ import flightdatautilities.masked_array_testutils as ma_test
 from analysis_engine.library import *
 from analysis_engine.node import (A, P, S, load, M, KTI, KeyTimeInstance, Section)
 
-from flight_phase_test import buildsections
+from analysis_engine.test_utils import buildsections
 
 test_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'test_data')
@@ -2927,7 +2927,7 @@ class TestGroundTrackPrecise(unittest.TestCase):
         gspd=[]
         duration_test_data_path = os.path.join(test_data_path,
                                                'precise_ground_track_test_data.csv')
-        with open(duration_test_data_path, 'rb') as csvfile:
+        with open(duration_test_data_path, 'rt') as csvfile:
             self.reader = csv.DictReader(csvfile)
             for row in self.reader:
                 # Sources to use from the recorded data file...
@@ -2955,7 +2955,7 @@ class TestGroundTrackPrecise(unittest.TestCase):
         gspd_data=[]
         duration_test_data_path = os.path.join(test_data_path,
                                                'precise_ground_track_test_data_Dublin.csv')
-        with open(duration_test_data_path, 'rb') as csvfile:
+        with open(duration_test_data_path, 'rt') as csvfile:
             self.reader = csv.DictReader(csvfile)
             for row in self.reader:
                 lat_data.append(float(row['Latitude']))
@@ -2982,7 +2982,7 @@ class TestGroundTrackPrecise(unittest.TestCase):
         gspd_data=[]
         duration_test_data_path = os.path.join(test_data_path,
                                                'precise_ground_track_test_data_Svalbard.csv')
-        with open(duration_test_data_path, 'rb') as csvfile:
+        with open(duration_test_data_path, 'rt') as csvfile:
             self.reader = csv.DictReader(csvfile)
             for row in self.reader:
                 lat_data.append(float(row['Latitude']))
@@ -4773,14 +4773,14 @@ class TestPeakCurvature(unittest.TestCase):
     # artificial data results in multiple maxima.
 
     def test_peak_curvature_basic(self):
-        array = np.ma.array([0]*20+range(20))
+        array = np.ma.array([0]*20+list(range(20)))
         pc = peak_curvature(array)
         self.assertEqual(pc,18.5)
         #  Very artificial case returns first location of many seconds of
         #  high curvature.
 
     def test_peak_curvature(self):
-        array = np.ma.array([0]*40+range(40))
+        array = np.ma.array([0]*40+list(range(40)))
         pc = peak_curvature(array)
         self.assertGreaterEqual(pc,35)
         self.assertLessEqual(pc,45)
@@ -4791,7 +4791,7 @@ class TestPeakCurvature(unittest.TestCase):
         self.assertEqual(pc,None)
 
     def test_peak_curvature_convex(self):
-        array = np.ma.array([0]*40+range(40))*(-1.0)
+        array = np.ma.array([0]*40+list(range(40)))*(-1.0)
         pc = peak_curvature(array, curve_sense='Convex')
         self.assertGreaterEqual(pc,35)
         self.assertLessEqual(pc,45)
@@ -4821,7 +4821,7 @@ class TestPeakCurvature(unittest.TestCase):
         self.assertEqual(pc,None)
 
     def test_peak_curvature_bipolar(self):
-        array = np.ma.array([0]*40+range(40))
+        array = np.ma.array([0]*40+list(range(40)))
         pc = peak_curvature(array, curve_sense='Bipolar')
         self.assertGreaterEqual(pc,35)
         self.assertLessEqual(pc,45)
@@ -4841,19 +4841,19 @@ class TestPeakCurvature(unittest.TestCase):
         self.assertEqual(pc, 24.5)
 
     def test_peak_curvature_slice_backwards(self):
-        array = np.ma.array([0]*40+range(40))
+        array = np.ma.array([0]*40+list(range(40)))
         pc = peak_curvature(array, slice(75, 10, -1))
         self.assertEqual(pc, 41.5)
 
     def test_peak_curvature_masked_data_no_curve(self):
-        array = np.ma.array([0]*40+range(40))
+        array = np.ma.array([0]*40+list(range(40)))
         array[:4] = np.ma.masked
         array[16:] = np.ma.masked
         pc = peak_curvature(array, slice(0,40))
         self.assertEqual(pc, None)
 
     def test_peak_curvature_masked_data(self):
-        array = np.ma.array([0]*40+range(40))
+        array = np.ma.array([0]*40+list(range(40)))
         array[:4] = np.ma.masked
         array[66:] = np.ma.masked
         pc = peak_curvature(array, slice(0,78))
@@ -4863,7 +4863,7 @@ class TestPeakCurvature(unittest.TestCase):
         hdg_data=[]
         data_path = os.path.join(test_data_path,
                                  'runway_high_speed_turnoff_test.csv')
-        with open(data_path, 'rb') as csvfile:
+        with open(data_path, 'rt') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 hdg_data.append(float(row['Heading']))
@@ -7014,7 +7014,7 @@ class TestSubslice(unittest.TestCase):
         new = slice(2, 4)
         res = subslice(orig, new)
         self.assertEqual(res, slice(4, 6))
-        fifty = range(50)
+        fifty = list(range(50))
         self.assertEqual(fifty[orig][new], fifty[res])
 
         # test basic starting from zero
@@ -7022,13 +7022,13 @@ class TestSubslice(unittest.TestCase):
         new = slice(0, 4)
         res = subslice(orig, new)
         self.assertEqual(res, slice(2, 6))
-        fifty = range(50)
+        fifty = list(range(50))
         self.assertEqual(fifty[orig][new], fifty[res])
 
         orig = slice(10,20,2)
         new = slice(2, 4, 1)
         res = subslice(orig, new)
-        thirty = range(30)
+        thirty = list(range(30))
         self.assertEqual(thirty[orig][new], thirty[res])
         self.assertEqual(res, slice(14, 18, 2))
 
@@ -7036,7 +7036,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(100,200,10)
         new = slice(1, 5, 2)
         sub = subslice(orig, new)
-        two_hundred = range(0,200)
+        two_hundred = list(range(0,200))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(sub, slice(110, 150, 20))
 
@@ -7044,14 +7044,14 @@ class TestSubslice(unittest.TestCase):
         orig = slice(200,100,-10)
         new = slice(1, 5, 2)
         sub = subslice(orig, new)
-        two_hundred = range(201)
+        two_hundred = list(range(201))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(sub, slice(190, 150, -20))
 
         orig = slice(100,200,10)
         new = slice(5, 1, -2)
         sub = subslice(orig, new)
-        two_hundred = range(201)
+        two_hundred = list(range(201))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(sub, slice(150, 110, -20))
         self.assertEqual(two_hundred[sub], [150, 130]) #fix
@@ -7060,7 +7060,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(0,200,10)
         new = slice(1, 5, -2)
         sub = subslice(orig, new)
-        two_hundred = range(201)
+        two_hundred = list(range(201))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(two_hundred[sub], []) # invalid returns no data
         self.assertEqual(sub, slice(10, 50, -20))
@@ -7069,7 +7069,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(None,100,10)
         new = slice(5, 1, -2)
         sub = subslice(orig, new)
-        two_hundred = range(200)
+        two_hundred = list(range(200))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(two_hundred[sub], [50,30])
         self.assertEqual(sub, slice(50, 10, -20))
@@ -7077,7 +7077,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(0,10,2)
         new = slice(None, 4)
         sub = subslice(orig, new)
-        two_hundred = range(5)
+        two_hundred = list(range(5))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(two_hundred[sub], [0,2,4]) # also tests outside of range
         self.assertEqual(sub, slice(0, 8, 2))
@@ -7086,7 +7086,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(None,200,10)
         new = slice(1, 5, -2)
         sub = subslice(orig, new)
-        two_hundred = range(201)
+        two_hundred = list(range(201))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(two_hundred[sub], [])
         self.assertEqual(sub, slice(10, 50, -20))
@@ -7095,7 +7095,7 @@ class TestSubslice(unittest.TestCase):
         orig = slice(0,10,2)
         new = slice(1, None)
         sub = subslice(orig, new)
-        two_hundred = range(5)
+        two_hundred = list(range(5))
         self.assertEqual(two_hundred[orig][new], two_hundred[sub])
         self.assertEqual(two_hundred[sub], [2,4])
         self.assertEqual(sub, slice(2, 10, 2))
@@ -7362,8 +7362,9 @@ class TestAlt2Press(unittest.TestCase):
     def test_01(self):
         # Truth values from NASA RP 1046
         Value = alt2press(np.ma.array([5000]))
-        Truth = 843.0725884 # mBar
-        self.assertAlmostEqual(Value, Truth)
+        Truth = np.ma.array([843.0725884]) # mBar
+        #self.assertAlmostEqual(Value, Truth)
+        ma_test.assert_masked_array_almost_equal(Value, Truth)
 
     def test_02(self):
         # Truth values from aerospaceweb

@@ -15,6 +15,7 @@ from analysis_engine.node import (
     KeyTimeInstance,
     Section,
 )
+
 from analysis_engine.flight_attribute import (
     DeterminePilot,
     DestinationAirport,
@@ -42,7 +43,7 @@ from analysis_engine.flight_attribute import (
 
 from flightdatautilities import api
 
-from flight_phase_test import buildsection
+from analysis_engine.test_utils import buildsection
 
 test_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'test_data')

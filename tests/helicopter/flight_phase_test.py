@@ -10,12 +10,8 @@ from analysis_engine.node import (A, App, ApproachItem, KTI,
                                   KeyTimeInstance, KPV, KeyPointValue, M,
                                   Parameter, P, S, Section, SectionNode, load)
 
-from ..flight_phase_test import (
-    builditem,
-    buildsection,
-    buildsections,
-    build_kti,
-)
+from analysis_engine.test_utils import buildsection
+
 
 class TestAirborne(unittest.TestCase):
     # Based closely on the level flight condition, but taking only the

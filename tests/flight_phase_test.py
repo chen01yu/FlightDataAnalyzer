@@ -70,67 +70,17 @@ from analysis_engine.node import (A, App, ApproachItem, KTI,
                                   Parameter, P, S, Section, SectionNode, load,
                                   aeroplane, helicopter)
 from analysis_engine.process_flight import process_flight
+from analysis_engine.test_utils import (
+    buildsection,
+    buildsections,
+    build_kti,
+)
 
 from analysis_engine.settings import AIRSPEED_THRESHOLD
 
 
 test_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'test_data')
-
-'''
-Three little routines to make building Sections for testing easier.
-'''
-def builditem(name, begin, end, start_edge=None, stop_edge=None):
-    '''
-    This code more accurately represents the aligned section values, but is
-    not suitable for test cases where the data does not get aligned.
-
-    if begin is None:
-        ib = None
-    else:
-        ib = int(begin)
-        if ib < begin:
-            ib += 1
-    if end is None:
-        ie = None
-    else:
-        ie = int(end)
-        if ie < end:
-            ie += 1
-
-    :param begin: index at start of section
-    :param end: index at end of section
-    '''
-    slice_end = end if end is None else end + 1
-    return Section(name, slice(begin, slice_end, None), start_edge or begin, stop_edge or end)
-
-
-def buildsection(name, *args):
-    '''
-    A little routine to make building Sections for testing easier.
-
-    :param name: name for a test Section
-    :returns: a SectionNode populated correctly.
-
-    Example: land = buildsection('Landing', 100, 120)
-    '''
-    return SectionNode(name, items=[builditem(name, *args)])
-
-
-def buildsections(name, *args):
-    '''
-    Like buildsection, this is used to build SectionNodes for test purposes.
-
-    lands = buildsections('name',[from1,to1],[from2,to2])
-
-    Example of use:
-    approach = buildsections('Approach', [80,90], [100,110])
-    '''
-    return SectionNode(name, items=[builditem(name, *a) for a in args])
-
-
-def build_kti(name, *args):
-    return KTI(items=[KeyTimeInstance(a, name) for a in args if a])
 
 
 ##############################################################################
@@ -591,7 +541,9 @@ class TestApproach(unittest.TestCase):
         self.assertAlmostEqual(app[2].slice.stop, 27342, places=0)
 
     def test_approach__helicopter_multiple(self):
-        alt_array = np.ma.array([1500]*5 + range(1500,50,-25) + range(50,1100,25) + range(1100,0,-25) + [0]*6)
+        alt_array = np.ma.array([1500]*5 + list(range(1500,50,-25)) + \
+                                list(range(50,1100,25)) + \
+                                list(range(1100,0,-25)) + [0]*6)
         alt = Parameter('Altitude AGL', alt_array)
         app = Approach()
         app.derive(helicopter, None, None, None, alt, alt)
@@ -1199,7 +1151,7 @@ class TestCruise(unittest.TestCase):
         self.assertEqual(test_phase.get_slices(), list(expected))
 
     def test_cruise_truncated_start(self):
-        alt_data = np.ma.array([15000]*5+range(15000,2000,-4000))
+        alt_data = np.ma.array([15000]*5+list(range(15000,2000,-4000)))
         #===========================================================
         alt = Parameter('Altitude STD', alt_data)
         ccd = ClimbCruiseDescent()

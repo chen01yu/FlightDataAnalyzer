@@ -4477,7 +4477,7 @@ class HeadingContinuous(DerivedParameterNode):
                 # the blend_two_parameters can give a result 180 deg out. The
                 # next three lines correct this error condition.
                 diff = np.ma.mean(head_capt.array) - np.ma.mean(head_fo.array)
-                corr = ((int(diff)+180)/360)*360.0
+                corr = ((int(diff)+180)//360)*360.0
                 head_fo.array += corr
 
                 self.array, self.frequency, self.offset = blend_two_parameters(head_capt, head_fo)
