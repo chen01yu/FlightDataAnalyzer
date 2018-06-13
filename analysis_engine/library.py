@@ -460,7 +460,7 @@ def align_args(slave_array, slave_frequency, slave_offset, master_frequency, mas
         # coefficients we gather the closest value in time to the master
         # parameter.
         if not interpolate:
-            b = round(b)
+            b = py2round(b)
 
         # Either way, a is the residual part.
         a = 1 - b
@@ -3753,61 +3753,44 @@ def slices_not(slice_list, begin_at=None, end_at=None):
         return [slice(begin_at, end_at)]
 
     start_slices = [s.start for s in slice_list]
-    if None in start_slices:
-        a = None
-    else:
-        a = min(start_slices)
+    a = None if None in start_slices else min(start_slices)
 
     stop_slices  = [s.stop for s in slice_list]
-    if None in stop_slices:
-        b = None
-    else:
-        b = min(stop_slices)
+    b =  None if None in stop_slices else min(stop_slices)
 
-    step_slices = [s.step or 1 for s in slice_list]
-    if None in step_slices: # is this the right behavior
-        c = None
-    else:
-        c = max(step_slices)
-        if c>1:
-            raise ValueError("slices_not does not cater for non-unity steps")
+    c = max([s.step or 1 for s in slice_list])
+    if c>1:
+        raise ValueError("slices_not does not cater for non-unity steps")
 
-    if a is None:
-        startpoint = None
-    else:
+    try:
         startpoint = a if b is None else min(a,b)
+    except TypeError:
+        startpoint = None
 
-    if begin_at is not None and begin_at < startpoint:
+    if begin_at is not None and startpoint is not None and begin_at < startpoint:
         startpoint = begin_at
     if startpoint is None:
-        startpoint = 0
+        startpoinstartpointt = 0
 
-    if [s for s in start_slices if s]:
-        c = max([s for s in start_slices if s])
-    else:
-        c = None
+    starts = [s for s in start_slices if s is not None]
+    c = max(starts) if starts else None
 
-    if [s for s in stop_slices if s]:
-        d = max([s for s in stop_slices if s])
-    else:
-        d = None
+    stops = [s for s in stop_slices if s]
+    d = max(stops) if stops else None
 
-    if c and d:
-        endpoint = max(c,d)
-    elif c != d:
-        endpoint = c or d
-    else:
-        endpoint = None
+    endpoint = max(c,d) if c and d else c or d
 
-    if end_at is not None and endpoint is not None and end_at > endpoint:
-        endpoint = end_at
+    try:
+        endpoint = end_at if end_at > endpoint else endpoint
+    except TypeError:
+        endpoint = end_at or endpoint
 
     workspace = np.ma.zeros(endpoint)
     for each_slice in slice_list:
         workspace[each_slice] = 1
     workspace=np.ma.masked_equal(workspace, 1)
-    return shift_slices(np.ma.clump_unmasked(workspace[startpoint:endpoint]), startpoint)
-
+    return shift_slices(np.ma.clump_unmasked(workspace[startpoint:endpoint]),
+                        startpoint)
 
 
 def slices_or(*slice_lists):
@@ -6132,7 +6115,7 @@ def slice_midpoint(_slice):
     :rtype: float
     '''
     difference = _slice.stop - (_slice.start or 0)
-    return _slice.stop - (difference / 2)
+    return _slice.stop - (difference // 2)
 
 
 def slice_multiply(_slice, f):
@@ -6782,8 +6765,9 @@ def step_values(array, steps, hz=1, step_at='midpoint', rate_threshold=0.5):
 
     roc = rate_of_change_array(array, hz)
 
-    for prev_midpoint, (flap_midpoint, direction), next_midpoint in zip_longest(
-        [0] + flap_changes[0:-1], sorted_transitions, flap_changes[1:]):
+    for prev_midpoint, (flap_midpoint, direction), next_midpoint in\
+        zip_longest( [0] + flap_changes[0:-1], sorted_transitions,
+                     flap_changes[1:]):
         prev_flap = prev_unmasked_value(stepped_array, floor(flap_midpoint),
                                         start_index=floor(prev_midpoint))
         stop_index = ceil(next_midpoint) if next_midpoint else None
@@ -6791,7 +6775,6 @@ def step_values(array, steps, hz=1, step_at='midpoint', rate_threshold=0.5):
                                         stop_index=stop_index).value
         is_masked = (array[floor(flap_midpoint)] is np.ma.masked or
                      array[ceil(flap_midpoint)] is np.ma.masked)
-
         if is_masked:
             new_array[prev_midpoint:prev_flap.index] = prev_flap.value
             prev_midpoint = prev_flap.index
@@ -7050,7 +7033,7 @@ def smooth_signal(array, window_len=11, window='hanning'):
     # off the end of the array. 
     if out.size > array.size:
         extra = out.size - array.size
-        extra_start = window_len/2-1
+        extra_start = window_len//2-1
     return np.ma.MaskedArray(out[extra_start:-(extra-extra_start)], array.mask)
 
 
@@ -7430,12 +7413,12 @@ def index_at_value(array, threshold, _slice=slice(None), endpoint='exact'):
 
     # Arrange the limits of our scan, ensuring that we stay inside the array.
     if step == 1:
-        begin = max(int(round(_slice.start or 0)), 0)
-        end = min(int(round(_slice.stop or max_index)), max_index)
+        begin = max(int(py2round(_slice.start or 0)), 0)
+        end = min(int(py2round(_slice.stop or max_index)), max_index)
         left, right = slice(begin, end - 1, step), slice(begin + 1, end,step)
 
     elif step == -1:
-        begin = min(int(round(_slice.start or max_index)), max_index-1)
+        begin = min(int(py2round(_slice.start or max_index)), max_index-1)
         # Indexing from the end of the array results in an array length
         # mismatch. There is a failing test to cover this case which may work
         # with array[:end:-1] construct, but using slices appears insoluble.
@@ -8568,3 +8551,10 @@ def max_maintained_value(arrays, samples, phase):
         return index, value
     else:
         return None, None
+
+def py2round(x, d=0):
+    '''
+    Provide the same rounding behaivor as the round() method in Python 2
+    '''
+    p = 10**d
+    return float(math.floor((x * p) + math.copysign(0.5, x))) / p
