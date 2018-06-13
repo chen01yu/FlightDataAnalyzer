@@ -24,6 +24,7 @@ from analysis_engine.library import (align,
                                      normalise,
                                      repair_mask,
                                      rate_of_change,
+                                     py2round,
                                      runs_of_ones,
                                      slices_of_runs,
                                      slices_remove_small_gaps,
@@ -328,7 +329,7 @@ def _split_on_eng_params(slice_start_secs, slice_stop_secs,
         split_params_min[split_params_slice] == split_value)[0]
     split_index = matching_indices[len(matching_indices) / 2] + slice_start
 
-    split_index = round(split_index / split_params_frequency)
+    split_index = py2round(split_index / split_params_frequency)
     return split_index, split_value
 
 
@@ -367,7 +368,7 @@ def _split_on_dfc(slice_start_secs, slice_stop_secs, dfc_frequency,
     else:
         # Split on the first DFC jump.
         dfc_jump = unmasked_edges[0]
-    dfc_index = round(dfc_jump + slice_start_secs + dfc_half_period)
+    dfc_index = py2round(dfc_jump + slice_start_secs + dfc_half_period)
     # account for rounding of dfc index exceeding slow slice
     if dfc_index > slice_stop_secs:
         split_index = slice_stop_secs
@@ -394,7 +395,7 @@ def _split_on_rot(slice_start_secs, slice_stop_secs, heading_frequency,
     '''
     rot_slice = slice(slice_start_secs * heading_frequency,
                       slice_stop_secs * heading_frequency)
-    midpoint = (rot_slice.stop - rot_slice.start) / 2
+    midpoint = (rot_slice.stop - rot_slice.start) // 2
     stopped_slices = np.ma.clump_unmasked(rate_of_turn[rot_slice])
     if not stopped_slices:
         return
@@ -404,9 +405,9 @@ def _split_on_rot(slice_start_secs, slice_stop_secs, heading_frequency,
     # Split half-way within the stop slice.
     stop_duration = middle_stop.stop - middle_stop.start
     rot_split_index = \
-        rot_slice.start + middle_stop.start + (stop_duration / 2)
+        rot_slice.start + middle_stop.start + (stop_duration // 2)
     # Get the absolute split index at 1Hz.
-    split_index = round(rot_split_index / heading_frequency)
+    split_index = py2round(rot_split_index / heading_frequency)
     return split_index
 
 
