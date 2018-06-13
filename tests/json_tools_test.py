@@ -115,7 +115,7 @@ class TestJsonTools(unittest.TestCase):
     def test_process_flight_to_nodes(self):
         nodes = process_flight_to_nodes(PROCESS_FLIGHT)
         self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes.keys(), [KTI_NAME])
+        self.assertEqual(list(nodes.keys()), [KTI_NAME])
         self.assertIn(KTI_NAME, nodes)
         node = nodes[KTI_NAME]
         self.assertTrue(isinstance(node, KeyTimeInstanceNode))
