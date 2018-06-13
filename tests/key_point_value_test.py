@@ -1074,6 +1074,7 @@ class CreateKPVsWithinSlicesTest(NodeTest):
     def test_derive_mocked(self):
         mock1, mock2, mock3 = Mock(), Mock(), Mock()
         mock1.array = Mock()
+        mock1.frequency = 1.0
         if hasattr(self, 'second_param_method_calls'):
             mock3 = Mock()
             setattr(mock2, self.second_param_method_calls[0][0], mock3)
@@ -4859,13 +4860,17 @@ class TestAirspeedWithFlapMax(unittest.TestCase, NodeTest):
 
         name = self.node_class.get_name()
         node = self.node_class()
-        node.derive(air_spd, None, None, flap_inc_trans, flap_exc_trans, fast)
-        self.assertEqual(node, KPV(name=name, items=[
+
+        expected = KPV(name=name, items=[
             KeyPointValue(index=29, value=29, name='Airspeed With Flap Including Transition 10 Max'),
             KeyPointValue(index=18, value=18, name='Airspeed With Flap Including Transition 5 Max'),  # 19 was masked
             KeyPointValue(index=29, value=29, name='Airspeed With Flap Excluding Transition 10 Max'),
             KeyPointValue(index=19, value=19, name='Airspeed With Flap Excluding Transition 5 Max'),
-        ]))
+        ])
+
+        node.derive(air_spd, None, None, flap_inc_trans, flap_exc_trans, fast)
+        self.assertEqual(sorted(node, key=lambda k: k.index or False),
+                         sorted(expected, key=lambda k: k.index or False))
 
     @patch.dict('analysis_engine.key_point_values.AirspeedWithFlapMax.NAME_VALUES', {'flap': (5.5, 10.1, 20.9)})
     def test_derive_fractional_settings(self):

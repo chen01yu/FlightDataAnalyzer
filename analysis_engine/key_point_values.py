@@ -8726,7 +8726,7 @@ class MachDuringCruiseAvg(KeyPointValueNode):
                cruises=S('Cruise')):
 
         for _slice in cruises.get_slices():
-            self.create_kpv(_slice.start + (_slice.stop - _slice.start) / 2,
+            self.create_kpv(_slice.start + (_slice.stop - _slice.start) // 2,
                             np.ma.mean(mach.array[_slice]))
 
 
@@ -12421,7 +12421,8 @@ class EngStartTimeMax(KeyPointValueNode):
             plt.show()
             '''
 
-            if eng_1_time > eng_2_time:
+            if eng_1_time and eng_2_time and eng_1_time > eng_2_time or \
+               eng_1_time and not eng_2_time:
                 self.create_kpv(eng_1_index, eng_1_time)
             elif eng_2_time:
                 self.create_kpv(eng_2_index, eng_2_time)
