@@ -2480,7 +2480,7 @@ class NodeManager(object):
         :rtype: list of str
         """
         return sorted(list(set(['HDF Duration']
-                               + self.hdf_keys
+                               + list(self.hdf_keys)
                                + list(self.derived_nodes.keys())
                                + list(self.aircraft_info.keys())
                                + list(self.achieved_flight_record.keys())
@@ -2615,6 +2615,12 @@ class Attribute(object):
         '''
         '''
         if self.name == other.name:
+            # https://stackoverflow.com/a/29916765 to mimic python 2 behaivor
+            if isinstance(self.value, dict) and isinstance(other.value, dict):
+                a, b = self.value, other.value
+                return (len(a) < len(b) or
+                        (len(a) == len(b) and
+                         sorted(a.items()) < sorted(b.items())))
             return self.value < other.value
         else:
             return self.name < other.name

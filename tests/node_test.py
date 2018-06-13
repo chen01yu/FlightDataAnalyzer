@@ -951,13 +951,14 @@ class TestFormattedNameNode(unittest.TestCase):
                 pass
         formatted_name_node = SpeedInPhaseAtAltitude()
         names = formatted_name_node.names()
-
-        self.assertEqual(names, ['Speed in ascent at 100 ft',
+        # The returned order is different between Python 2 & 3
+        self.assertEqual(sorted(names),
+                         sorted(['Speed in ascent at 100 ft',
                                  'Speed in ascent at 400 ft',
                                  'Speed in ascent at 700 ft',
                                  'Speed in descent at 100 ft',
                                  'Speed in descent at 400 ft',
-                                 'Speed in descent at 700 ft',])
+                                 'Speed in descent at 700 ft',]))
 
     def test__validate_name(self):
         """ Ensures that created names have a validated option
