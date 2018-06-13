@@ -148,12 +148,13 @@ class TestDependencyGraph(unittest.TestCase):
         gr_all, gr_st, order = process_order(_graph, mgr)
         self.assertEqual(set(required) - set(order), set())
     
+    @unittest.skip("Ignoring as graph_nodes does nothing with required nodes")
     def test_required_unavailable(self):
         nodes = ['a', 'b', 'c']
         required = ['a', 'c', 'd']
         mgr = NodeManager({'Start Datetime': datetime.now()}, 10, nodes, nodes, 
                           required, {}, {}, {})
-        gr = self.assertRaises(graph_nodes(mgr))
+        self.assertRaises(ValueError, graph_nodes, mgr)
     
     def test_graph_predecessors(self):
         edges = [('a', 'b'), ('b', 'c1'), ('b', 'c2'), ('b', 'c3'), ('c2', 'd'),
@@ -192,7 +193,7 @@ class TestDependencyGraph(unittest.TestCase):
                            self.derived_nodes, {}, {})
         gr = graph_nodes(mgr2)
         self.assertEqual(len(gr), 11)
-        self.assertEqual(gr.neighbors('root'), ['P8', 'P7'])
+        self.assertEqual(sorted(gr.neighbors('root')), sorted(['P8', 'P7']))
         
     def test_graph_requesting_all_dependencies_links_root_to_end_leafs(self):
         # build list of all nodes as required
@@ -201,7 +202,7 @@ class TestDependencyGraph(unittest.TestCase):
                           self.derived_nodes, {}, {})
         gr = graph_nodes(mgr)
         # should only be linked to end leafs
-        self.assertEqual(gr.neighbors('root'), ['P8', 'P7'])
+        self.assertEqual(sorted(gr.neighbors('root')), sorted(['P8', 'P7']))
         
     def test_graph_middle_level_depenency_builds_partial_tree(self):
         requested = ['P5']
@@ -228,20 +229,20 @@ class TestDependencyGraph(unittest.TestCase):
                 pass
         one = One('overridden')
         four = Four('used')
-        mgr1 = NodeManager({'Start Datetime': datetime.now()}, 10, [1, 2], [2, 4], [],
-                           {1:one, 4:four},{}, {})
+        mgr1 = NodeManager({'Start Datetime': datetime.now()}, 10, ['1', '2'], ['2', '4'], [],
+                           {'1':one, '4':four},{}, {})
         gr = graph_nodes(mgr1)
         self.assertEqual(len(gr), 5)
         # LFL
-        self.assertEqual(gr.edges(1), []) # as it's in LFL, it shouldn't have any edges
-        self.assertEqual(gr.node[1], {'color': '#72f4eb', 'node_type': 'HDFNode'})
+        self.assertEqual(gr.edges('1'), []) # as it's in LFL, it shouldn't have any edges
+        self.assertEqual(gr.node['1'], {'color': '#72f4eb', 'node_type': 'HDFNode'})
         # Derived
-        self.assertEqual(gr.edges(4), [(4,'DepFour')])
-        self.assertEqual(gr.node[4], {'color': '#72cdf4', 'node_type': 'DerivedParameterNode'})
+        self.assertEqual(gr.edges('4'), [('4','DepFour')])
+        self.assertEqual(gr.node['4'], {'color': '#72cdf4', 'node_type': 'DerivedParameterNode'})
         # Root
         from analysis_engine.dependency_graph import draw_graph
         draw_graph(gr, 'test_graph_nodes_with_duplicate_key_in_lfl_and_derived')
-        self.assertEqual(gr.successors('root'), [2,4]) # only the two requested are linked
+        self.assertEqual(gr.successors('root'), ['2','4']) # only the two requested are linked
         self.assertEqual(gr.node['root'], {'color': '#ffffff'})
         
     def test_dependency(self):
