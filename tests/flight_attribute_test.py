@@ -361,7 +361,7 @@ class TestDestinationAirport(unittest.TestCase):
     
     def setUp(self):
         dest_array = np.ma.array(
-            ['FDSL', 'FDSL', 'FDSL', 'FDSL', 'ABCD', 'ABCD'],
+            [b'FDSL', b'FDSL', b'FDSL', b'FDSL', b'ABCD', b'ABCD'],
             mask=[True, False, False, False, False, True])
         self.dest = P('Destination', array=dest_array)
         self.afr_dest = A('AFR Destination Airport', value={'id': 2000})
@@ -371,7 +371,7 @@ class TestDestinationAirport(unittest.TestCase):
     def test_derive_dest(self, get_airport):
         self.node.derive(self.dest, None)
         self.assertEqual(self.node.value, get_airport.return_value)
-        get_airport.assert_called_once_with('FDSL')
+        get_airport.assert_called_once_with(b'FDSL')
     
     def test_derive_afr_dest(self):
         self.node.derive(None, self.afr_dest)
@@ -381,7 +381,7 @@ class TestDestinationAirport(unittest.TestCase):
     def test_derive_both(self, get_airport):
         self.node.derive(self.dest, self.afr_dest)
         self.assertEqual(self.node.value, get_airport.return_value)
-        get_airport.assert_called_once_with('FDSL')
+        get_airport.assert_called_once_with(b'FDSL')
     
     def test_derive_invalid(self):
         dest_array = np.ma.array(
@@ -443,11 +443,12 @@ class TestFlightNumber(unittest.TestCase):
 
     def test_derive_ascii(self):
         flight_number_param = P('Flight Number',
-                                array=np.ma.masked_array(['ABC', 'DEF', 'DEF']))
+                                array=np.ma.masked_array(['ABC', 'DEF', 'DEF'],
+                                                         dtype=np.string_))
         flight_number = FlightNumber()
         flight_number.set_flight_attr = Mock()
         flight_number.derive(flight_number_param)
-        flight_number.set_flight_attr.assert_called_with('DEF')
+        flight_number.set_flight_attr.assert_called_with(b'DEF')
         flight_number.set_flight_attr.reset_mock()
         # Entirely masked.
         flight_number_param.array[:] = np.ma.masked
