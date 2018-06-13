@@ -108,7 +108,8 @@ class AltitudeADH(DerivedParameterNode):
         if len(rad_peak_idxs)<4:
             return
 
-        slice_idxs = zip(rad_peak_idxs[:-2], rad_peak_idxs[1:-1], rad_peak_idxs[2:], rad_peak_vals[1:])
+        slice_idxs = list(zip(rad_peak_idxs[:-2], rad_peak_idxs[1:-1],
+                              rad_peak_idxs[2:], rad_peak_vals[1:]))
         for slice_idx in slice_idxs[1:-1]:
             this_deck_slice = slice(slice_idx[0]+1, slice_idx[2]-1)
             if slice_idx[3] > 5.0:

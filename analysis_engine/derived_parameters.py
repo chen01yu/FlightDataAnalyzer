@@ -4303,8 +4303,7 @@ class SlatAngle(DerivedParameterNode):
             self.offset = slat_angle_rec.offset
             self.array = second_window(slat_angle_rec.array, 1, 2) # 3 sample smoothing
         else:
-            detents = at.get_slat_map(model.value, series.value, family.value).keys()
-            detents.sort()
+            detents = sorted(at.get_slat_map(model.value, series.value, family.value).keys())
             # align
             master = first_valid_parameter(slat_full, slat_part, slat_retracted)
             self.frequency = master.frequency
@@ -5600,7 +5599,7 @@ class VerticalSpeedForFlightPhases(DerivedParameterNode):
 
     def derive(self, alt_std = P('Altitude STD Smoothed')):
         # This uses a scaled hysteresis parameter. See settings for more detail.
-        threshold = HYSTERESIS_FPROC * max(1, rms_noise(alt_std.array))
+        threshold = HYSTERESIS_FPROC * max(1, rms_noise(alt_std.array) or 1)
         # The max(1, prevents =0 case when testing with artificial data.
         self.array = hysteresis(rate_of_change(alt_std, 6) * 60, threshold)
 
@@ -7572,7 +7571,8 @@ class TrackDeviationFromRunway(DerivedParameterNode):
                 # limit to previous approach stop
                 prev_app = apps.get_previous(app.slice.start, use='start')
                 prev_app_idx = prev_app.slice.stop if prev_app else 0
-                app_start = max(to_stop, app.slice.start-900, prev_app_idx)
+                idxs = [i for i in [to_stop, app.slice.start-900, prev_app_idx] if i]
+                app_start = max(idxs) if idxs else None
                 _slice = slice(app_start, app.slice.stop)
                 self._track_deviation(track.array, _slice, runway, magnetic)
 

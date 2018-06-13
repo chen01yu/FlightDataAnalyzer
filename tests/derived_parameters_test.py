@@ -3686,8 +3686,9 @@ class TestTrackDeviationFromRunway(unittest.TestCase):
             turnoff=8998.2717013888887)])
         heading_track = load(os.path.join(test_data_path, 'HeadingDeviationFromRunway_heading_track.nod'))
         to_runway = load(os.path.join(test_data_path, 'HeadingDeviationFromRunway_runway.nod'))
-        takeoff = load(os.path.join(test_data_path, 'HeadingDeviationFromRunway_takeoff.nod'))
-
+        takeoff = buildsections('Takeoff', [963.22222222222217, 1145.751417357174])
+        takeoff.frequency = 2.0
+        takeoff.offset=0.1328125
         deviation = TrackDeviationFromRunway()
         deviation.get_derived((heading_track, None, takeoff, to_runway, apps))
         # check average stays close to 0
@@ -4179,7 +4180,7 @@ class TestWindAcrossLandingRunway(unittest.TestCase):
         walr = WindAcrossLandingRunway()
         walr.derive(ws,wd,None,land_rwy,None)
         expected = np.ma.array([50.55619778])
-        self.assertAlmostEqual(walr.array.data, expected.data, 1)
+        np.testing.assert_array_almost_equal(walr.array.data, expected.data, 1)
 
     def test_error_cases(self):
         ws = P('Wind Speed', np.ma.array([84.0]))
