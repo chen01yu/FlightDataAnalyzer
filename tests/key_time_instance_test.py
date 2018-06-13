@@ -853,7 +853,7 @@ class TestTopOfClimb(unittest.TestCase):
         self.assertEqual(phase, expected)
 
     def test_top_of_climb_truncated_start(self):
-        alt_data = np.ma.array([800]*5+range(800,0,-100))
+        alt_data = np.ma.array([800]*5+list(range(800,0,-100)))
         alt = Parameter('Altitude STD Smoothed', np.ma.array(alt_data))
         phase = TopOfClimb()
         in_air = buildsection('Climb Cruise Descent',0,len(alt.array))
