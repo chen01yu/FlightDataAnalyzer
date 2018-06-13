@@ -1783,7 +1783,7 @@ class TestLanding(unittest.TestCase):
         self.assertEqual(landing.get_slices(), expected.get_slices())
 
     def test_landing_aeroplane_turnoff(self):
-        head = np.ma.array([20]*15+range(20,0,-2))
+        head = np.ma.array([20]*15+list(range(20,0,-2)))
         alt_aal = np.ma.array([100,80,60,40,20]+[0]*26)
         phase_fast = buildsection('Fast',0,5)
         landing = Landing()
@@ -1796,7 +1796,7 @@ class TestLanding(unittest.TestCase):
         self.assertEqual(landing.get_slices(), expected.get_slices())
 
     def test_landing_aeroplane_turnoff_left(self):
-        head = np.ma.array([20]*15+range(20,0,-2))*-1.0
+        head = np.ma.array([20]*15+list(range(20,0,-2)))*-1.0
         alt_aal = np.ma.array([100,80,60,40,20]+[0]*26)
         phase_fast = buildsection('Fast', 0, 5)
         landing = Landing()
@@ -1810,7 +1810,7 @@ class TestLanding(unittest.TestCase):
 
     def test_landing_aeroplane_with_multiple_fast(self):
         # ensure that the result is a single phase!
-        head = np.ma.array([20]*15+range(20,0,-2))
+        head = np.ma.array([20]*15+list(range(20,0,-2)))
         alt_aal = np.ma.array(list(range(140,0,-10))+[0]*26)
         # first test the first section that is not within the landing heights
         phase_fast = buildsections('Fast', [2, 5], [7, 10])
@@ -1946,7 +1946,8 @@ class TestLevelFlight(unittest.TestCase, NodeTest):
         self.operational_combinations = [('Airborne', 'Vertical Speed For Flight Phases')]
 
     def test_level_flight_phase_basic(self):
-        data = list(range(0, 400, 1)) + list(range(400, -450, -1)) + list(range(-450, 50, 1))
+        data = list(range(0, 400, 1)) + list(range(400, -450, -1)) +\
+            list(range(-450, 50, 1))
         vrt_spd = Parameter(
             name='Vertical Speed For Flight Phases',
             array=np.ma.array(data),
@@ -1962,7 +1963,8 @@ class TestLevelFlight(unittest.TestCase, NodeTest):
             Section('Level Flight', slice(1400, 1750, None), 1400, 1750)])
 
     def test_level_flight_phase_not_airborne_basic(self):
-        data = list(range(0, 400, 1)) + list(range(400, -450, -1)) + list(range(-450, 50, 1))
+        data = list(range(0, 400, 1)) + list(range(400, -450, -1)) +\
+            list(range(-450, 50, 1))
         vrt_spd = Parameter(
             name='Vertical Speed For Flight Phases',
             array=np.ma.array(data),
@@ -2000,7 +2002,8 @@ class TestStationary(unittest.TestCase, NodeTest):
         self.operational_combinations = [('Groundspeed',)]
 
     def test_stationary_basic(self):
-        data = [0]*30+list(range(0, 60, 1)) + list(range(60,0,-2) + [0]*20)
+        data = [0]*30 + list(range(0, 60, 1)) +\
+            list(range(60,0,-2)) + [0]*20
         gspd = Parameter('Groundspeed',array=np.ma.array(data))
         station = Stationary()
         station.derive(gspd)
@@ -2024,8 +2027,9 @@ class TestStraightAndLevel(unittest.TestCase, NodeTest):
         self.operational_combinations = [('Level Flight', 'Heading')]
 
     def test_straight_and_level_basic(self):
-        data = [0]*60+list(range(0, 360, 1)) + list(range(360,0,-2) + [0]*120)
-        hdg = Parameter('Heading',array=np.ma.array(data))
+        data = [0]*60+ list(range(0, 360, 1)) +\
+            list(range(360,0,-2)) + [0]*120
+        hdg = Parameter('Heading',array=np.ma.array(data, dtype=np.float64))
         level = buildsection('Level Flight', 0, 900)
         s_and_l = StraightAndLevel()
         s_and_l.derive(level, hdg)
