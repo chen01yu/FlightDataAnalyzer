@@ -2,6 +2,7 @@ import datetime
 import numpy as np
 import os
 import unittest
+import inspect
 
 from mock import patch
 from numpy.ma.testutils import assert_array_equal
@@ -2226,7 +2227,6 @@ class TestFlapLeverSynthetic(unittest.TestCase, NodeTest):
         approach = buildsections('Approach And Landing', (7,10))
         node = self.node_class()
         node.derive(flap, slat, None, model, series, family, approach, frame)
-        
         self.assertEqual(list(node.array), list(np.repeat(expected, repeat)))
         
         
@@ -2934,9 +2934,42 @@ class TestSmokeWarning(unittest.TestCase):
     def setUp(self):
         self.node_class = SmokeWarning
 
+    @unittest.skip("Taking too long generating all 2,097,151 combinations")
     def test_can_operate(self):
         opts = self.node_class.get_operational_combinations()
         self.assertEqual(len(opts), 2**21-1)
+
+    def test_can_operate_simple(self):
+        expected_params = [
+            'Smoke Avionics Warning',
+            'Smoke Avionics (1) Warning',
+            'Smoke Avionics (2) Warning',
+            'Smoke Lavatory Warning',
+            'Smoke Lavatory (1) Warning',
+            'Smoke Lavatory (2) Warning',
+            'Smoke Cabin Warning',
+            'Smoke Cabin Rest (1) Warning',
+            'Smoke Cabin Rest (2) Warning',
+            'Smoke Cargo Warning',
+            'Smoke Cargo Fwd (1) Warning',
+            'Smoke Cargo Fwd (2) Warning',
+            'Smoke Cargo Aft (1) Warning',
+            'Smoke Cargo Aft (2) Warning',
+            'Smoke Cargo Rest (1) Warning',
+            'Smoke Cargo Rest (2) Warning',
+            'Smoke Lower Deck Stowage',
+            'Smoke Avionic Bulk',
+            'Smoke IFEC',
+            'Smoke BCRC',
+            'Smoke Autonomous VCC',
+        ]
+        derived_args = inspect.getargspec(self.node_class.derive).defaults
+        derived_params = [n.name for n in derived_args]
+        self.assertEqual(len(derived_params), len(expected_params))
+        self.assertEqual(sorted(derived_params), sorted(expected_params))
+        for warning in expected_params:
+            self.assertTrue(self.node_class.can_operate([warning]))
+
 
     def test_derive(self):
         one = M('Smoke Avionics (1) Warning', np.ma.array([0, 1, 0, 0, 0, 0]),

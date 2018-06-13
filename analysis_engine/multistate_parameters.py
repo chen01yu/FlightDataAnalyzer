@@ -1377,13 +1377,16 @@ class FlapLeverSynthetic(MultistateDerivedParameterNode):
             if use_conf:
                 state = at.constants.CONF_TO_LEVER[state]
             self.array[condition] = state
-            
+
         frame_name = frame.value if frame else None
         approach_slices = approach.get_slices() if approach else None
-        
+
         if frame_name == 'E170_EBD_047' and approach_slices is not None:
+            # The Lever 4 and 5 share the same flap/slat config.
+            # On approaches the config is refferred to as Lever 5
+            self.array[self.array == 32] = 16  # ensure lever 4 before approach mod
             self.array[approach_slices][self.array[approach_slices] == 16] = 32
-            
+
 
 class Flaperon(MultistateDerivedParameterNode):
     '''
@@ -2190,7 +2193,7 @@ class PilotFlying(MultistateDerivedParameterNode):
             pilot_flying = nearest_neighbour_mask_repair(pilot_flying, repair_gap_size=20*self.frequency, copy=False)
             # use second window to remove spiking between captain and first
             # officer during dual stick periods
-            pilot_flying = second_window(pilot_flying, self.frequency, 2).astype(np.short)
+            pilot_flying = second_window(pilot_flying.raw, self.frequency, 2).astype(np.short)
 
         self.array = pilot_flying
 
