@@ -4,6 +4,8 @@ Three little routines to make building Sections for testing easier.
 from analysis_engine.node import (
     Section,
     SectionNode,
+    KeyTimeInstance,
+    KTI,
 )
 
 def builditem(name, begin, end, start_edge=None, stop_edge=None):
