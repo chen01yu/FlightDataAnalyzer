@@ -6115,7 +6115,7 @@ def slice_midpoint(_slice):
     :rtype: float
     '''
     difference = _slice.stop - (_slice.start or 0)
-    return _slice.stop - (difference // 2)
+    return _slice.stop - (float(difference) / 2)
 
 
 def slice_multiply(_slice, f):

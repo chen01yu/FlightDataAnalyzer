@@ -20811,7 +20811,7 @@ class TestTaxiInDuration(unittest.TestCase):
         node = TaxiInDuration()
         node.derive(taxi_ins)
         self.assertEqual(len(node), 2)
-        self.assertEqual(node[0], KeyPointValue(8, 5, 'Taxi In Duration'))
+        self.assertEqual(node[0], KeyPointValue(7.5, 5, 'Taxi In Duration'))
         self.assertEqual(node[1], KeyPointValue(25, 10, 'Taxi In Duration'))
 
 
