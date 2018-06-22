@@ -17390,6 +17390,8 @@ class TailwindLiftoffTo100FtMax(KeyPointValueNode):
 class Tailwind100FtToTouchdownMax(KeyPointValueNode):
     '''
     Maximum tailwind between the 100ft AAL and the point of touchdown.
+
+    To avoid ground effect, dont read tailwind after 50ft AAL.
     Note: a negative tailwind is a headwind
     '''
 
@@ -17398,11 +17400,11 @@ class Tailwind100FtToTouchdownMax(KeyPointValueNode):
     def derive(self,
                tailwind=P('Tailwind'),
                alt_aal=P('Altitude AAL For Flight Phases'),
-               touchdowns=KTI('Touchdown')):
+               ):
 
         self.create_kpvs_within_slices(
             tailwind.array,
-            alt_aal.slices_to_kti(100, touchdowns),
+            alt_aal.slices_between(100, 50),
             max_value,
         )
 
@@ -17419,20 +17421,21 @@ class TailwindDuringTakeoffMax(KeyPointValueNode):
     def derive(self,
                tailwind=P('Tailwind'),
                airspeed=P('Airspeed True'),
-               liftoffs=KTI('Liftoff'),
                toffs=S('Takeoff'),
+               toff_rotations=S('Takeoff Rotation'),
                ):
 
-        for toff in toffs:
+        toff_windows = slices_and_not(toffs.get_slices(), toff_rotations.get_slices())
+
+        for toff in toff_windows:
             spd = np.ma.masked_less(airspeed.array, 60)
-            first_spd_idx = first_valid_sample(spd[toff.slice])[0]
+            first_spd_idx = first_valid_sample(spd[toff])[0]
+
             if first_spd_idx:
-                first_spd_idx = first_spd_idx + toff.slice.start
-                liftoff = liftoffs.get_first(within_slice=toff.slice)
-                if liftoff:
-                    self.create_kpvs_within_slices(tailwind.array,
-                                                   (slice(first_spd_idx, liftoff.index),),
-                                                   max_value)
+                first_spd_idx = first_spd_idx + toff.start
+                self.create_kpvs_within_slices(tailwind.array,
+                                              (slice(first_spd_idx, toff.stop),),
+                                               max_value)
             else:
                 self.warning('No Valid Airspeed True in takeof phase?')
 

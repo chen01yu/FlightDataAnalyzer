@@ -20816,13 +20816,20 @@ class TestTailwind100FtToTouchdownMax(unittest.TestCase, NodeTest):
     def setUp(self):
         # XXX: This test does not explicitly test how the Touchdown dependency is used.
         self.node_class = Tailwind100FtToTouchdownMax
-        self.operational_combinations = [('Tailwind', 'Altitude AAL For Flight Phases', 'Touchdown')]
-        #self.function = max_value
-        #self.second_param_method_calls = [('slices_to_kti', (100, []), {})]
+        self.operational_combinations = [('Tailwind', 'Altitude AAL For Flight Phases')]
 
-    @unittest.skip('Test Not Implemented')
+    def test_can_operate(self):
+        opts = self.node_class.get_operational_combinations()
+        self.assertEqual(opts, [('Tailwind', 'Altitude AAL For Flight Phases')])
+
     def test_derive(self):
-        self.assertTrue(False, msg='Test not implemented.')
+        x = np.linspace(0,10,200)
+        tailwind = P('Tailwind', x*np.sin(x)*3)
+        alt_aal = P('Altitude AAL For Flight Phases', np.linspace(150,20,200))
+        node = self.node_class()
+        node.derive(tailwind, alt_aal)
+
+        self.assertEqual(len(node), 1)
 
 
 class TestTailwindDuringTakeoffMax(unittest.TestCase):
@@ -20830,10 +20837,9 @@ class TestTailwindDuringTakeoffMax(unittest.TestCase):
     def setUp(self):
         self.node_class = TailwindDuringTakeoffMax
 
-
     def test_can_operate(self):
         opts = self.node_class.get_operational_combinations(ac_type=aeroplane)
-        self.assertEqual(opts, [('Tailwind', 'Airspeed True', 'Liftoff', 'Takeoff')])
+        self.assertEqual(opts, [('Tailwind', 'Airspeed True', 'Takeoff', 'Takeoff Rotation')])
         opts = self.node_class.get_operational_combinations(ac_type=helicopter)
         self.assertEqual(opts, [])
 
@@ -20843,10 +20849,10 @@ class TestTailwindDuringTakeoffMax(unittest.TestCase):
         ias = P('Airspeed', np.ma.concatenate(([0]*125, np.ma.arange(10,160,2))))
         ias.array[:126] = np.ma.masked
         toff = buildsection('Takeoff', 50, 185)
-        liftoff=KTI('Liftoff', items=[KeyTimeInstance(175, 'Liftoff')])
+        toff_rotation = buildsection('Takeoff Rotation', 165, 190)
 
         node = self.node_class()
-        node.derive(tailwind, ias, liftoff, toff)
+        node.derive(tailwind, ias, toff, toff_rotation)
 
         self.assertEqual(len(node), 1)
         self.assertEqual(node[0].index, 159)
@@ -20858,16 +20864,31 @@ class TestTailwindDuringTakeoffMax(unittest.TestCase):
         spd_array = np.ma.concatenate(([0]*125, np.ma.arange(10,160,2)))
         spd_array = np.ma.masked_less_equal(spd_array, 100)
         ias = P('Airspeed', spd_array)
-
         toff = buildsection('Takeoff', 50, 185)
-        liftoff=KTI('Liftoff', items=[KeyTimeInstance(175, 'Liftoff')])
+        toff_rotation = buildsection('Takeoff Rotation', 175, 190)
 
         node = self.node_class()
-        node.derive(tailwind, ias, liftoff, toff)
+        node.derive(tailwind, ias, toff, toff_rotation)
 
         self.assertEqual(len(node), 1)
         self.assertEqual(node[0].index, 171)
         self.assertAlmostEqual(node[0].value, 19.05, places=2)
+
+    def test_derive__tailwind_high_during_rotation(self):
+        # Name not really true
+        x = np.linspace(0, 10, 200)
+        spd_array = np.ma.concatenate(([0]*125, np.ma.arange(10,160,2)))
+        spd_array = np.ma.masked_less_equal(spd_array, 100)
+
+        tailwind = P('Tailwind', x*np.sin(x)*3)
+        ias = P('Airspeed', spd_array)
+        toff = buildsection('Takeoff', 50, 185)
+        toff_rotation = buildsection('Takeoff Rotation', 158, 190)
+
+        node = self.node_class()
+        node.derive(tailwind, ias, toff, toff_rotation)
+
+        self.assertEqual(len(node), 0)
 
 
 class TestFuelQtyLowWarningDuration(unittest.TestCase):
