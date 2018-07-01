@@ -6577,7 +6577,7 @@ def step_local_cusp(array, span):
         return 0
 
 
-def including_transition(array, steps, threshold=0.20):
+def including_transition(array, steps, threshold=0.05):
     '''
     Snaps signal to step values including transition, e.g.:
           _____
@@ -6589,37 +6589,73 @@ def including_transition(array, steps, threshold=0.20):
     :type steps: [int]
     :param threshold: Threshold of difference between two flap settings to apply the next flap setting.
     :type threshold: float
+    
+    threshold = 0.01 makes the system too late and too conservative.
     '''
-    # XXX: Problematic signals could benefit from second_window.
-    #array = second_window(array, 1, 10, extend_window=True)
-    steps = sorted(steps)
 
-    # Identify the angles which correspond to steps as these can differ.
-    # This is required as a 'tuned' threshold approach cannot match all cases.
-    step_data = defaultdict(list)
-    diff = np.ma.abs(np.ma.ediff1d(array))
-    for stable_slice in runs_of_ones(diff < 0.01, min_samples=5):
-        step_array = array[stable_slice]
-        step = min(steps, key=lambda s: abs(step_array[0] - s))
-        step_data[step].append(step_array)
+    def incl_trans(steps, array, threshold):
+        '''
+        '''
+        mode = 'include'
+        
+        steps = sorted(steps)
+        mid_steps = [steps[0] - 10.0]
+        
+        for step_1, step_2 in zip(steps[:-1], steps[1:]):
+            mid_steps.append((step_1 + step_2) / 2.0)
+        mid_steps.append(steps[-1] + 10.0)
 
-    step_angles = {s: float(np.ma.mean(np.ma.concatenate(a))) for s, a in six.iteritems(step_data)}
+        change = np.ma.abs(np.ma.ediff1d(array, to_begin=0.0))
+        
+        # first raise the array to the next step if it exceeds the previous step
+        # plus a minimal threshold (step as early as possible)
+        output = np_ma_masked_zeros_like(array)
 
-    # first raise the array to the next step if it exceeds the previous step
-    # plus a minimal threshold (step as early as possible)
-    output = np_ma_zeros_like(array, mask=array.mask)
+        for mid_1, flap, mid_2 in zip(mid_steps[:-1], steps, mid_steps[1:]):
+            # Slice the data into bands that are between the midpoint flap values
+            bands = slices_and(runs_of_ones(array > mid_1), runs_of_ones(array <= mid_2))
+            for band in bands:
+                # Find where the data did not change in this band...
+                partial = np.ma.where(change[band] == 0.0, flap, np.ma.masked)
+                if np.ma.count(partial):
+                    # Unchanged data can be included in our output flap array directly
+                    output[band] = partial
+                else:
+                    # The data did not have a still moment, so see if it passed
+                    # through the flap setting of interest.
+                    index = index_at_value(array[band], flap)
+                    if index:
+                        output[index + band.start + 1] = flap
+                    else:
+                        # The data may have just crept into this band without being a 
+                        # true change into the new flap setting. Let's just ignore this.
+                        pass
+                    
+        for gap in np.ma.clump_masked(output):
+            before = output[max(gap.start - 1, 0)]
+            after = output[min(gap.stop, len(output) - 1)]
+            if mode == 'include':
+                output[gap] = max(before, after)
+            else:
+                output[gap] = min(before, after)
+    
+        return output
 
-    for step, next_step in zip(steps, steps[1:]):
-        step_angle = step_angles.get(step, step)
-        next_step_angle = step_angles.get(next_step, next_step)
-
-        step_threshold = ((next_step_angle - step_angle) * threshold)
-        for above_slice in runs_of_ones(array >= step_angle + step_threshold):
-            # check that the section reached 2 * threshold, otherwise the
-            # 'early stepping' is being too eager.
-            if np.ma.max(array[above_slice]) >= step_angle + (2 * step_threshold):
-                output[above_slice] = next_step
-
+    import matplotlib.pyplot as plt
+    thresholds = ['Flap', 0.0]
+    plt.figure(figsize=(14,8))
+    plt.plot(array)
+    plt.plot(incl_trans(steps, array, thresholds[1]))
+    plt.legend(thresholds, loc='upper centre')
+    name = 'Flap' + str(len(array))
+    print ('Look_At', name)
+    plt.savefig('C:\\FlightDataRunner\\88-Results\\' + name + '.png', dpi = (500))
+    # plt.show()
+    plt.clf()
+    plt.close()
+    
+    output = incl_trans(steps, array, 0.0)
+    
     return output
 
 
