@@ -6641,18 +6641,18 @@ def including_transition(array, steps, threshold=0.05):
     
         return output
 
-    import matplotlib.pyplot as plt
-    thresholds = ['Flap', 0.0]
-    plt.figure(figsize=(14,8))
-    plt.plot(array)
-    plt.plot(incl_trans(steps, array, thresholds[1]))
-    plt.legend(thresholds, loc='upper centre')
-    name = 'Flap' + str(len(array))
-    print ('Look_At', name)
-    plt.savefig('C:\\FlightDataRunner\\88-Results\\' + name + '.png', dpi = (500))
-    # plt.show()
-    plt.clf()
-    plt.close()
+    ##import matplotlib.pyplot as plt
+    ##thresholds = ['Flap', 0.0]
+    ##plt.figure(figsize=(14,8))
+    ##plt.plot(array)
+    ##plt.plot(incl_trans(steps, array, thresholds[1]))
+    ##plt.legend(thresholds, loc='upper centre')
+    ##name = 'Flap' + str(len(array))
+    ##print ('Look_At', name)
+    ##plt.savefig('C:\\FlightDataRunner\\88-Results\\' + name + '.png', dpi = (500))
+    ### plt.show()
+    ##plt.clf()
+    ##plt.close()
     
     output = incl_trans(steps, array, 0.0)
     
