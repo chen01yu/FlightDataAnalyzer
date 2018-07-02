@@ -20816,18 +20816,19 @@ class TestTailwind100FtToTouchdownMax(unittest.TestCase, NodeTest):
     def setUp(self):
         # XXX: This test does not explicitly test how the Touchdown dependency is used.
         self.node_class = Tailwind100FtToTouchdownMax
-        self.operational_combinations = [('Tailwind', 'Altitude AAL For Flight Phases')]
+        self.operational_combinations = [('Tailwind', 'Altitude AAL For Flight Phases', 'Approach And Landing')]
 
     def test_can_operate(self):
         opts = self.node_class.get_operational_combinations()
-        self.assertEqual(opts, [('Tailwind', 'Altitude AAL For Flight Phases')])
+        self.assertEqual(opts, [('Tailwind', 'Altitude AAL For Flight Phases', 'Approach And Landing')])
 
     def test_derive(self):
         x = np.linspace(0,10,200)
         tailwind = P('Tailwind', x*np.sin(x)*3)
+        landing = buildsection('Approach And Landing', 10, 150)
         alt_aal = P('Altitude AAL For Flight Phases', np.linspace(150,20,200))
         node = self.node_class()
-        node.derive(tailwind, alt_aal)
+        node.derive(tailwind, alt_aal, landing)
 
         self.assertEqual(len(node), 1)
 

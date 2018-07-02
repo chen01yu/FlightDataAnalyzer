@@ -17369,8 +17369,9 @@ class TailwindLiftoffTo100FtMax(KeyPointValueNode):
     units = ut.KT
 
     def derive(self,
-               tailwind=P('Tailwind'),
-               alt_aal=P('Altitude AAL For Flight Phases')):
+                tailwind=P('Tailwind'),
+                alt_aal=P('Altitude AAL For Flight Phases'),
+                ):
         '''
         FDS developed this KPV to support the UK CAA Significant Seven programme.
         "Excursions - Take-Off (Longitudinal), Tailwind - Needs to be recorded just
@@ -17400,11 +17401,13 @@ class Tailwind100FtToTouchdownMax(KeyPointValueNode):
     def derive(self,
                tailwind=P('Tailwind'),
                alt_aal=P('Altitude AAL For Flight Phases'),
+               landing=S('Approach And Landing'),
                ):
 
+        low_alt = alt_aal.slices_between(100, 50)
         self.create_kpvs_within_slices(
             tailwind.array,
-            alt_aal.slices_between(100, 50),
+            slices_and(landing.get_slices(), low_alt),
             max_value,
         )
 
