@@ -4410,6 +4410,49 @@ class SlopeAngleToAimingPoint(DerivedParameterNode):
         self.array = np.degrees(np.arctan(slope_to_ldg.array))
 
 
+class FlightPathAngle(DerivedParameterNode):
+    '''
+
+    '''
+    units = ut.DEGREE
+
+    @classmethod
+    def can_operate(cls, available):
+        return all_of(('Altitude AAL', 'SAT', 'Approach And Landing'),
+                      available) and \
+               any_of(('Aiming Point Range', 'Distance To Landing'), available)
+
+    def derive(self, alt_aal=P('Altitude AAL'),
+               dist_aim=P('Aiming Point Range'),
+               dist_land=P('Distance To Landing'),
+               sat=P('SAT'),
+               apps=S('Approach And Landing')):
+        dist = dist_aim or dist_land
+        self.array = np_ma_masked_zeros_like(alt_aal.array)
+        for app in apps:
+            if not np.ma.count(alt_aal.array[app.slice]):
+                continue
+            # What's the temperature deviation from ISA at landing?
+            dev = from_isa(alt_aal.array[app.slice].compressed()[-1],
+                           sat.array[app.slice].compressed()[-1])
+            # now correct the altitude for temperature deviation.
+            alt = alt_dev2alt(alt_aal.array[app.slice], dev)
+
+            alt_cropped = mask_outside_slices(alt, runs_of_ones(alt >= 200.0))
+            alt_band = runs_of_ones(alt_cropped < 500)[0]
+
+            corr, slope, offset = coreg(
+                alt_aal.array[shift_slice(alt_band, app.slice.start)],
+                indep_var=dist.array[shift_slice(alt_band, app.slice.start)]
+            )
+
+            dist_adj = -offset/slope
+            slope_to_ldg = alt_cropped / ut.convert(
+                dist.array[app.slice]-dist_adj, ut.NM, ut.FT
+            )
+            self.array[app.slice] = np.degrees(np.arctan(slope_to_ldg))
+
+
 '''
 
 TODO: Revise computation of sliding motion
