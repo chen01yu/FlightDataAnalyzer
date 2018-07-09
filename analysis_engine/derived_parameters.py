@@ -4412,7 +4412,8 @@ class SlopeAngleToAimingPoint(DerivedParameterNode):
 
 class FlightPathAngle(DerivedParameterNode):
     '''
-
+    This parameter calculates the slope angle in degrees.
+    Altitude AAL is adjusted according to the ISA standard using SAT at landing.
     '''
     units = ut.DEGREE
 

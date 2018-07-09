@@ -7535,7 +7535,9 @@ class HeightLoss1000To2000Ft(KeyPointValueNode):
 # Flight Path Angle KPVs
 
 class FlightPathAngle1500To1000FtMax(KeyPointValueNode):
-
+    '''
+    Maximum Flight Path Angle between 1,500 and 1,000 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
@@ -7546,7 +7548,9 @@ class FlightPathAngle1500To1000FtMax(KeyPointValueNode):
 
 
 class FlightPathAngle1500To1000FtMin(KeyPointValueNode):
-
+    '''
+    Minimum Flight Path Angle between 1,500 and 1,000 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
@@ -7557,7 +7561,9 @@ class FlightPathAngle1500To1000FtMin(KeyPointValueNode):
 
 
 class FlightPathAngle1000To500FtMax(KeyPointValueNode):
-
+    '''
+    Maximum Flight Path Angle between 1,000 and 500 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
@@ -7568,7 +7574,9 @@ class FlightPathAngle1000To500FtMax(KeyPointValueNode):
 
 
 class FlightPathAngle1000To500FtMin(KeyPointValueNode):
-
+    '''
+    Minimum Flight Path Angle between 1,000 and 500 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
@@ -7579,7 +7587,9 @@ class FlightPathAngle1000To500FtMin(KeyPointValueNode):
 
 
 class FlightPathAngle500To200FtMax(KeyPointValueNode):
-
+    '''
+    Maximum Flight Path Angle between 500 and 200 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
@@ -7590,7 +7600,9 @@ class FlightPathAngle500To200FtMax(KeyPointValueNode):
 
 
 class FlightPathAngle500To200FtMin(KeyPointValueNode):
-
+    '''
+    Minimum Flight Path Angle between 500 and 200 ft Altitude AAL
+    '''
     units = ut.DEGREE
 
     def derive(self, angle=P('Flight Path Angle'),
