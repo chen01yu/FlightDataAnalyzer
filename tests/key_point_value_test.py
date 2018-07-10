@@ -2294,7 +2294,8 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     acc_norm=acc_norm,
                     acc_limit=limit)
 
-        self.assertEqual(len(node), 0)
+        self.assertEqual(node[0].index, 7)
+        self.assertEqual(node[0].value, 0)
 
     def test_derive_hard_landing(self):
         node = self.node_class()
@@ -2312,7 +2313,8 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     acc_limit=limit)
 
         self.assertEqual(node[0].index, 4)
-        self.assertEqual(node[0].value, 1.95)
+        self.assertAlmostEqual(node[0].value, 0.2)
+        self.assertGreater(node[0].value, 0)
 
     def test_derive_no_hard_landing(self):
         node = self.node_class()
@@ -2329,7 +2331,9 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     acc_norm=acc_norm,
                     acc_limit=limit)
 
-        self.assertEqual(len(node), 0)
+        self.assertEqual(node[0].index, 13)
+        self.assertAlmostEqual(node[0].value, -0.15)
+        self.assertLess(node[0].value, 0)
 
     def test_derive_hard_touch_and_go_plus_hard_touchdown(self):
         # Both hard landings
@@ -2350,9 +2354,11 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     touch_and_go=touch_and_go)
 
         self.assertEqual(node[0].index, 13)
-        self.assertEqual(node[0].value, 2.50)
-        self.assertEqual(node[1].index, 3)
-        self.assertEqual(node[1].value, 1.99)
+        self.assertAlmostEqual(node[0].value, 0.4)
+        self.assertAlmostEqual(node[1].index, 3)
+        self.assertAlmostEqual(node[1].value, 0.24)
+        self.assertGreater(node[0].value, 0)
+        self.assertGreater(node[1].value, 0)
 
     def test_derive_hard_touch_and_go_plus_touchdown(self):
         # One hard landing
@@ -2373,8 +2379,12 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     touch_and_go=touch_and_go,
                     )
 
-        self.assertEqual(node[0].index, 3)
-        self.assertEqual(node[0].value, 1.99)
+        self.assertEqual(node[0].index, 13)
+        self.assertAlmostEqual(node[0].value, -0.2)
+        self.assertEqual(node[1].index, 3)
+        self.assertAlmostEqual(node[1].value, 0.24)
+        self.assertLess(node[0].value, 0)
+        self.assertGreater(node[1].value, 0)
 
     def test_derive_touch_and_go_plus_touchdown(self):
         # No hard landings
@@ -2395,8 +2405,12 @@ class TestAccelerationNormalAboveWeightLimitAtTouchdown(unittest.TestCase):
                     touch_and_go=touch_and_go,
                     )
 
-        self.assertEqual(len(node), 0)
-
+        self.assertEqual(node[0].index, 13)
+        self.assertAlmostEqual(node[0].value, -0.9)
+        self.assertEqual(node[1].index, 3)
+        self.assertAlmostEqual(node[1].value, -0.46)
+        self.assertLess(node[0].value, 0)
+        self.assertLess(node[1].value, 0)
 
 class TestAccelerationNormalLiftoffTo35FtMax(unittest.TestCase, NodeTest):
 

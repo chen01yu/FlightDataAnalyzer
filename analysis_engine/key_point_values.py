@@ -784,7 +784,10 @@ class AccelerationNormalAtTouchdown(KeyPointValueNode):
 
 class AccelerationNormalAboveWeightLimitAtTouchdown(KeyPointValueNode):
     '''
-    Acceleration Normal at touchdown is above the limit for the aircraft's weight.
+    Returns the difference between the Acceleration Normal and the limit for 
+    Acceleration Normal for the aircraft's weight
+    
+    Positive if Acceleration Normal exceeds weight limit.
     Specific to Embraer 170/175.
     '''
     units = ut.G
@@ -797,9 +800,8 @@ class AccelerationNormalAboveWeightLimitAtTouchdown(KeyPointValueNode):
                ):
 
         for idx, tdwn in enumerate(tdwns+touch_and_go):
-            hard_landing = acc_limit.array[tdwn.index] < acc_norm.array[tdwn.index]
-            if hard_landing:
-                self.create_kpv(tdwn.index, acc_norm.array[tdwn.index])
+            difference = acc_norm.array[tdwn.index] - acc_limit.array[tdwn.index]
+            self.create_kpv(tdwn.index, difference)
 
 
 class LoadFactorThresholdAtTouchdown(KeyPointValueNode):
