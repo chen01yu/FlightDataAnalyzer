@@ -167,7 +167,7 @@ from analysis_engine.derived_parameters import (
     FlapAngle,
     FlapManoeuvreSpeed,
     FlapSynchroAsymmetry,
-    FlightPathAngle,
+    ApproachFlightPathAngle,
     MGBOilTemp,
     MGBOilPress,
     FuelQty,
@@ -5689,7 +5689,7 @@ class TestSlopeAngleToLanding(unittest.TestCase):
 
 class TestFlightPathAngle(unittest.TestCase):
     def setUp(self):
-        self.node_class = FlightPathAngle
+        self.node_class = ApproachFlightPathAngle
 
     def test_can_operate(self):
         opts = self.node_class.get_operational_combinations()
@@ -5757,7 +5757,7 @@ class TestFlightPathAngle(unittest.TestCase):
         node = self.node_class()
         node.derive(alt_aal, None, dist_land, sat, buildsection('Approach And Landing', 1, 106))
 
-        self.assertEqual(node.name, "Flight Path Angle")
+        self.assertEqual(node.name, "Approach Flight Path Angle")
         self.assertEqual(len(node.array.compressed()), 83)
         self.assertAlmostEqual(node.array.max(), 3.14, places=2)
         self.assertAlmostEqual(node.array.min(), 3.02, places=2)

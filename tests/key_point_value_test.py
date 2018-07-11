@@ -422,12 +422,12 @@ from analysis_engine.key_point_values import (
     FlareDistance20FtToTouchdown,
     FlareDuration20FtToTouchdown,
     FlightControlPreflightCheck,
-    FlightPathAngle1500To1000FtMax,
-    FlightPathAngle1500To1000FtMin,
-    FlightPathAngle1000To500FtMax,
-    FlightPathAngle1000To500FtMin,
-    FlightPathAngle500To200FtMax,
-    FlightPathAngle500To200FtMin,
+    ApproachFlightPathAngle1500To1000FtMax,
+    ApproachFlightPathAngle1500To1000FtMin,
+    ApproachFlightPathAngle1000To500FtMax,
+    ApproachFlightPathAngle1000To500FtMin,
+    ApproachFlightPathAngle500To200FtMax,
+    ApproachFlightPathAngle500To200FtMin,
     FuelJettisonDuration,
     FuelQtyAtLiftoff,
     FuelQtyAtTouchdown,
@@ -8554,11 +8554,11 @@ class TestTrackVariation100To50Ft(unittest.TestCase):
 ##############################################################################
 # Flight Path Angle
 
-class TestFlightPathAngle1500To1000FtMax(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle1500To1000FtMax(unittest.TestCase,
+                                                 CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle1500To1000FtMax
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle1500To1000FtMax
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = max_value
         self.second_param_method_calls = [('slices_from_to', (1500, 1000), {})]
@@ -8568,11 +8568,11 @@ class TestFlightPathAngle1500To1000FtMax(unittest.TestCase,
         self.assertTrue(False, msg='Test Not Implemented')
 
 
-class TestFlightPathAngle1500To1000FtMin(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle1500To1000FtMin(unittest.TestCase,
+                                                 CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle1500To1000FtMin
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle1500To1000FtMin
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = min_value
         self.second_param_method_calls = [('slices_from_to', (1500, 1000), {})]
@@ -8582,11 +8582,11 @@ class TestFlightPathAngle1500To1000FtMin(unittest.TestCase,
         self.assertTrue(False, msg='Test Not Implemented')
 
 
-class TestFlightPathAngle1000To500FtMax(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle1000To500FtMax(unittest.TestCase,
+                                                CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle1000To500FtMax
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle1000To500FtMax
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = max_value
         self.second_param_method_calls = [('slices_from_to', (1000, 500), {})]
@@ -8596,11 +8596,11 @@ class TestFlightPathAngle1000To500FtMax(unittest.TestCase,
         self.assertTrue(False, msg='Test Not Implemented')
 
 
-class TestFlightPathAngle1000To500FtMin(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle1000To500FtMin(unittest.TestCase,
+                                                CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle1000To500FtMin
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle1000To500FtMin
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = min_value
         self.second_param_method_calls = [('slices_from_to', (1000, 500), {})]
@@ -8610,11 +8610,11 @@ class TestFlightPathAngle1000To500FtMin(unittest.TestCase,
         self.assertTrue(False, msg='Test Not Implemented')
 
 
-class TestFlightPathAngle500To200FtMax(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle500To200FtMax(unittest.TestCase,
+                                               CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle500To200FtMax
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle500To200FtMax
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = max_value
         self.second_param_method_calls = [('slices_from_to', (500, 200), {})]
@@ -8624,11 +8624,11 @@ class TestFlightPathAngle500To200FtMax(unittest.TestCase,
         self.assertTrue(False, msg='Test Not Implemented')
 
 
-class TestFlightPathAngle500To200FtMin(unittest.TestCase,
-                                         CreateKPVsWithinSlicesTest):
+class TestApproachFlightPathAngle500To200FtMin(unittest.TestCase,
+                                               CreateKPVsWithinSlicesTest):
     def setUp(self):
-        self.node_class = FlightPathAngle500To200FtMin
-        self.operational_combinations = [('Flight Path Angle',
+        self.node_class = ApproachFlightPathAngle500To200FtMin
+        self.operational_combinations = [('Approach Landing Flight Path Angle',
                                           'Altitude AAL For Flight Phases')]
         self.function = min_value
         self.second_param_method_calls = [('slices_from_to', (500, 200), {})]

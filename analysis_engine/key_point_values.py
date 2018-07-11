@@ -7534,78 +7534,78 @@ class HeightLoss1000To2000Ft(KeyPointValueNode):
 ##############################################################################
 # Flight Path Angle KPVs
 
-class FlightPathAngle1500To1000FtMax(KeyPointValueNode):
+class ApproachFlightPathAngle1500To1000FtMax(KeyPointValueNode):
     '''
     Maximum Flight Path Angle between 1,500 and 1,000 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(1500, 1000),
                                        max_value)
 
 
-class FlightPathAngle1500To1000FtMin(KeyPointValueNode):
+class ApproachFlightPathAngle1500To1000FtMin(KeyPointValueNode):
     '''
     Minimum Flight Path Angle between 1,500 and 1,000 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(1500, 1000),
                                        min_value)
 
 
-class FlightPathAngle1000To500FtMax(KeyPointValueNode):
+class ApproachFlightPathAngle1000To500FtMax(KeyPointValueNode):
     '''
     Maximum Flight Path Angle between 1,000 and 500 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(1000, 500),
                                        max_value)
 
 
-class FlightPathAngle1000To500FtMin(KeyPointValueNode):
+class ApproachFlightPathAngle1000To500FtMin(KeyPointValueNode):
     '''
     Minimum Flight Path Angle between 1,000 and 500 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(1000, 500),
                                        min_value)
 
 
-class FlightPathAngle500To200FtMax(KeyPointValueNode):
+class ApproachFlightPathAngle500To200FtMax(KeyPointValueNode):
     '''
     Maximum Flight Path Angle between 500 and 200 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(500, 200),
                                        max_value)
 
 
-class FlightPathAngle500To200FtMin(KeyPointValueNode):
+class ApproachFlightPathAngle500To200FtMin(KeyPointValueNode):
     '''
     Minimum Flight Path Angle between 500 and 200 ft Altitude AAL
     '''
     units = ut.DEGREE
 
-    def derive(self, angle=P('Flight Path Angle'),
+    def derive(self, angle=P('Approach Landing Flight Path Angle'),
                alt_aal=P('Altitude AAL For Flight Phases')):
         self.create_kpvs_within_slices(angle.array,
                                        alt_aal.slices_from_to(500, 200),

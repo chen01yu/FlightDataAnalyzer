@@ -4410,10 +4410,18 @@ class SlopeAngleToAimingPoint(DerivedParameterNode):
         self.array = np.degrees(np.arctan(slope_to_ldg.array))
 
 
-class FlightPathAngle(DerivedParameterNode):
+class ApproachFlightPathAngle(DerivedParameterNode):
     '''
-    This parameter calculates the slope angle in degrees.
-    Altitude AAL is adjusted according to the ISA standard using SAT at landing.
+    This parameter calculates the slope angle (in degrees) of a landing.
+
+    The Altitude AAL is adjusted according to the ISA standard using SAT at landing.
+    Parameter is calculated from the start of the approach phase to 200ft to avoid
+    spike as the angle rapidly changes when passing over the aiming point.
+    At 500-200 Coreg (correlation and linear regression) calculations is used
+    to further straighten the path to a point between the aiming point and the
+    landing point. This means both 'Aiming Point Range' and 'Distance To Landing'.
+    The distance to the aiming point (piano keys) is used in preference but can
+    fallback to using landing point distance.
     '''
     units = ut.DEGREE
 
