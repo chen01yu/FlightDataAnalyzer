@@ -3396,8 +3396,8 @@ class AirspeedWithFlapMax(KeyPointValueNode, FlapOrConfigurationMaxOrMin):
                flap_inc_trans=M('Flap Including Transition'),
                flap_exc_trans=M('Flap Excluding Transition'),
                scope=S('Fast'),
-               flap_angle=P('Flap Angle'),
-               manufacturer=A('Manufacturer')
+               ##flap_angle=P('Flap Angle'),
+               ##manufacturer=A('Manufacturer')
                ):
         
         # Masking single values that cause invalid events to trigger when 
@@ -3415,39 +3415,44 @@ class AirspeedWithFlapMax(KeyPointValueNode, FlapOrConfigurationMaxOrMin):
         for flap in (flap_avail, flap_inc_trans, flap_exc_trans):
             if not flap:
                 continue
+            # Fast scope traps flap changes very late on the approach and
+            # raising flaps before 80 kt on the landing run.
+            data = self.flap_or_conf_max_or_min(flap, airspeed, max_value, scope)
+            for index, value, detent in data:
+                self.create_kpv(index, value, parameter=flap.name, flap=detent)
             
-            # Changing the current 'Flap Including Transition' parameter to monitor transitions 
-            # to a reading of 0.1 degrees for Boeing - there is a requirement for an inspection
-            # if airspeed is high for each flap setting, including the transition period, until 
-            # the flap reaches the next position
+            ### Changing the current 'Flap Including Transition' parameter to monitor transitions 
+            ### to a reading of 0.1 degrees for Boeing - there is a requirement for an inspection
+            ### if airspeed is high for each flap setting, including the transition period, until 
+            ### the flap reaches the next position
             
-            if manufacturer.value == 'Boeing' and flap.name == 'Flap Including Transition' and \
-               flap_angle and len(flap.array) == len(flap_angle.array):
+            ##if manufacturer.value == 'Boeing' and flap.name == 'Flap Including Transition' and \
+               ##flap_angle and len(flap.array) == len(flap_angle.array):
                 
-                initial_flap = deepcopy(flap.array)
-                flap_array = flap.array
-                transition = False
-                for i in range(0, len(flap_array)-1):
-                    if initial_flap[i] is not np.ma.masked and initial_flap[i+1] is not np.ma.masked and flap_angle.array[i+1] is not np.ma.masked:
-                        if initial_flap.raw[i] > initial_flap.raw[i+1] and flap_angle.array[i+1] > initial_flap.raw[i+1] + 0.1:
-                            transition = True
-                            flap_array.raw[i+1] = flap_array.raw[i]
-                            continue
-                        if transition:
-                            if initial_flap.raw[i] == initial_flap.raw[i+1] and flap_angle.array[i+1] > initial_flap.raw[i+1] + 0.1:
-                                flap_array.raw[i+1] = flap_array.raw[i]
-                            else:
-                                transition = False
-                data = self.flap_or_conf_max_or_min(flap, airspeed, max_value, scope)
-                for index, value, detent in data:
-                    self.create_kpv(index, value, parameter=flap.name, flap=detent)
+                ##initial_flap = deepcopy(flap.array)
+                ##flap_array = flap.array
+                ##transition = False
+                ##for i in range(0, len(flap_array)-1):
+                    ##if initial_flap[i] is not np.ma.masked and initial_flap[i+1] is not np.ma.masked and flap_angle.array[i+1] is not np.ma.masked:
+                        ##if initial_flap.raw[i] > initial_flap.raw[i+1] and flap_angle.array[i+1] > initial_flap.raw[i+1] + 0.1:
+                            ##transition = True
+                            ##flap_array.raw[i+1] = flap_array.raw[i]
+                            ##continue
+                        ##if transition:
+                            ##if initial_flap.raw[i] == initial_flap.raw[i+1] and flap_angle.array[i+1] > initial_flap.raw[i+1] + 0.1:
+                                ##flap_array.raw[i+1] = flap_array.raw[i]
+                            ##else:
+                                ##transition = False
+                ##data = self.flap_or_conf_max_or_min(flap, airspeed, max_value, scope)
+                ##for index, value, detent in data:
+                    ##self.create_kpv(index, value, parameter=flap.name, flap=detent)
             
-            else:
-                # Fast scope traps flap changes very late on the approach and
-                # raising flaps before 80 kt on the landing run.
-                data = self.flap_or_conf_max_or_min(flap, airspeed, max_value, scope)
-                for index, value, detent in data:
-                    self.create_kpv(index, value, parameter=flap.name, flap=detent)
+            ##else:
+                ### Fast scope traps flap changes very late on the approach and
+                ### raising flaps before 80 kt on the landing run.
+                ##data = self.flap_or_conf_max_or_min(flap, airspeed, max_value, scope)
+                ##for index, value, detent in data:
+                    ##self.create_kpv(index, value, parameter=flap.name, flap=detent)
 
 
 class AirspeedWithFlapMin(KeyPointValueNode, FlapOrConfigurationMaxOrMin):
