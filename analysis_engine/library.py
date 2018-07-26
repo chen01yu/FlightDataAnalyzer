@@ -6585,7 +6585,7 @@ def step_local_cusp(array, span):
         return 0
 
 
-def including_transition(array, steps, threshold=0.05):
+def including_transition(array, steps, threshold=0.07):
     '''
     Snaps signal to step values including transition, e.g.:
           _____
